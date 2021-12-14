@@ -1,0 +1,24 @@
+Trigger AccountContact on account (after update) 
+{
+  public static boolean flag=true;
+  If(flag==true) 
+  {
+  	account acc =[select id,outOfZip__c,BillingPostalCode from account where id in : trigger.new];
+  	List<contact>conList = [select id, name,MailingPostalCode from contact where accountId in : acc];
+  	List<contact>conListNew = new List<contact>();
+  	for (contact con : conList)
+ 	{
+   		if(acc.BillingPostalCode != con.MailingPostalCode)
+  		{
+   			conListNew.add(con);
+  		}
+
+ 	}
+ 	If(conListNew.size()>=1)
+ 	{
+   		acc.outOfZip__c=true;
+    }
+	flag=false;
+	update acc;
+  }
+}
